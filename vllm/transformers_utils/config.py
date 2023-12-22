@@ -2,7 +2,7 @@ from typing import Optional
 
 from transformers import AutoConfig, PretrainedConfig
 
-from vllm.transformers_utils.configs import *
+from vllm.transformers_utils.configs import *  # pylint: disable=wildcard-import
 
 _CONFIG_REGISTRY = {
     "aquila": AquilaConfig,
@@ -13,6 +13,7 @@ _CONFIG_REGISTRY = {
     "RefinedWeb": RWConfig,  # For tiiuae/falcon-40b(-instruct)
     "RefinedWebModel": RWConfig,  # For tiiuae/falcon-7b(-instruct)
     "yi": YiConfig,
+    "thomas": ThomasConfig,
 }
 
 
@@ -20,8 +21,10 @@ def get_config(model: str,
                trust_remote_code: bool,
                revision: Optional[str] = None) -> PretrainedConfig:
     try:
-        config = AutoConfig.from_pretrained(
-            model, trust_remote_code=trust_remote_code, revision=revision)
+        if "carbon" in model.lower() or "thomas" in model.lower():
+            config = ThomasConfig.from_pretrained(model, trust_remote_code=trust_remote_code, revision=revision)
+        else:
+            config = AutoConfig.from_pretrained(model, trust_remote_code=trust_remote_code, revision=revision)
     except ValueError as e:
         if (not trust_remote_code and
                 "requires you to execute the configuration file" in str(e)):
@@ -37,3 +40,4 @@ def get_config(model: str,
         config_class = _CONFIG_REGISTRY[config.model_type]
         config = config_class.from_pretrained(model, revision=revision)
     return config
+
