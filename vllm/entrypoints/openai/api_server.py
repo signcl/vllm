@@ -231,10 +231,11 @@ async def create_chat_completion(request: ChatCompletionRequest,
                                      "logit_bias is not currently supported")
 
     try:
-        prompt = tokenizer.apply_chat_template(
-            conversation=request.messages,
-            tokenize=False,
-            add_generation_prompt=request.add_generation_prompt)
+        prompt = request.messages[0]['content']
+        #prompt = tokenizer.apply_chat_template(
+        #    conversation=request.messages,
+        #    tokenize=False,
+        #    add_generation_prompt=request.add_generation_prompt)
     except Exception as e:
         logger.error(f"Error in applying chat template from request: {str(e)}")
         return create_error_response(HTTPStatus.BAD_REQUEST, str(e))
