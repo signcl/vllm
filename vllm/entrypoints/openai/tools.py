@@ -123,6 +123,8 @@ class OpenAIToolsPrompter:
                 select_tool_choice = None
             text_inject = self.template.render_toolslist(
             tool_choice=select_tool_choice, tools_list=request.tools)
+            # text_inject = '''You are a xiaosuan, a large language model trained by openbayes computing.\nYou are a helpful, respectful, and honest assistant. \n### Human：\n''' + text_inject
+            text_inject = '''\n### Human：\n''' + text_inject
             if isinstance(request.messages, str):
                 request.messages = text_inject + request.messages
             elif isinstance(request.messages,

@@ -78,10 +78,11 @@ class OpenAIServingChat(OpenAIServing):
                     m.content = self.openai_tools_prompter.content_from_tool(m)
                     
         try:
-            prompt = self.tokenizer.apply_chat_template(
-                conversation=request.messages,
-                tokenize=False,
-                add_generation_prompt=request.add_generation_prompt)
+            prompt = request.messages[0].content
+            # prompt = self.tokenizer.apply_chat_template(
+            #     conversation=request.messages,
+            #     tokenize=False,
+            #     add_generation_prompt=request.add_generation_prompt)
         except Exception as e:
             logger.error(
                 f"Error in applying chat template from request: {str(e)}")
