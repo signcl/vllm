@@ -216,7 +216,7 @@ async def show_available_models():
 
 @app.get("/version")
 async def show_version():
-    ver = {"version": vllm.__version__}
+    ver = {"version": 'v0.3.3'}
     return JSONResponse(content=ver)
 
 
@@ -282,7 +282,7 @@ if __name__ == "__main__":
             raise ValueError(f"Invalid middleware {middleware}. "
                              f"Must be a function or a class.")
 
-    logger.info(f"vLLM API server version {vllm.__version__}")
+    logger.info(f"vLLM API server version v0.3.3")
     logger.info(f"args: {args}")
     
     if args.privileged:

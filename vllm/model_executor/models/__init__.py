@@ -46,6 +46,7 @@ _MODELS = {
     "StableLMEpochForCausalLM": ("stablelm", "StablelmForCausalLM"),
     "StableLmForCausalLM": ("stablelm", "StablelmForCausalLM"),
     "Starcoder2ForCausalLM": ("starcoder2", "Starcoder2ForCausalLM"),
+    "ThomasForCausalLM": ("thomas", "ThomasForCausalLM"),
 }
 
 # Models not supported by ROCm.

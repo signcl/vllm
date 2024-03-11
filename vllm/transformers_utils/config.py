@@ -10,6 +10,7 @@ _CONFIG_REGISTRY = {
     "RefinedWeb": RWConfig,  # For tiiuae/falcon-40b(-instruct)
     "RefinedWebModel": RWConfig,  # For tiiuae/falcon-7b(-instruct)
     "starcoder2": Starcoder2Config,
+    "thomas": ThomasConfig,
 }
 
 
@@ -25,7 +26,13 @@ def get_config(model: str,
                                               revision=revision,
                                               code_revision=code_revision)
         return config
-
+    if "carbon" in model.lower() or "thomas" in model.lower():
+        config_class = _CONFIG_REGISTRY["thomas"]
+        config = config_class.from_pretrained(model, 
+                                              revision=revision,
+                                              code_revision=code_revision)
+        return config
+    
     try:
         config = AutoConfig.from_pretrained(
             model,
