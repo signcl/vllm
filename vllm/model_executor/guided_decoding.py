@@ -61,7 +61,8 @@ def _get_guide_and_mode(
             for tool in request.tools:
                 if tool.type == "function":
                     if tool.function.name == request.tool_choice.function.name:
-                        json = json_dumps(tool.function.parameters, sort_keys=True)
+                        json = json_dumps(tool.function.parameters,
+                                          sort_keys=True)
                         return json, GuidedDecodingMode.JSON
         return None, None
     elif request.guided_json:

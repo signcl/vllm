@@ -4,10 +4,10 @@ import jinja2
 from enum import Enum
 from typing import List, Union
 from vllm.logger import init_logger
-from vllm.entrypoints.openai.protocol import (ChatCompletionRequest, ChatCompletionToolParam,
-                       ChoiceDeltaToolCall, ChatCompletionMessageToolCall,
-                       Function, ChatCompletionAssistantMessage,
-                       ChatCompletionToolMessage, ChatCompletionNamedToolChoiceParam)
+from vllm.entrypoints.openai.protocol import (
+    ChatCompletionRequest, ChatCompletionToolParam, ChoiceDeltaToolCall,
+    ChatCompletionMessageToolCall, Function, ChatCompletionAssistantMessage,
+    ChatCompletionToolMessage, ChatCompletionNamedToolChoiceParam)
 
 logger = init_logger(__name__)
 
@@ -59,7 +59,8 @@ class ToolsCallsTemplate:
         return self.template.render(
             CONTEXT=ToolsCallsTemplateContext.TOOL_RESPONSE, message=message)
 
-    def render_toolslist(self, tool_choice: Union[str, ChatCompletionNamedToolChoiceParam],
+    def render_toolslist(self, tool_choice: Union[
+        str, ChatCompletionNamedToolChoiceParam],
                          tools_list: [ChatCompletionToolParam]) -> str:
         if isinstance(tool_choice, str) and tool_choice == "auto":
             tool_choice = None
@@ -114,7 +115,8 @@ class OpenAIToolsPrompter:
         """ Generate and inject the prompt for tools calls. """
         if request.tools is not None and self.call_token_str is not None and len(
                 request.tools):
-            if (isinstance(request.tool_choice, ChatCompletionNamedToolChoiceParam)):
+            if (isinstance(request.tool_choice,
+                           ChatCompletionNamedToolChoiceParam)):
                 if request.tool_choice.type == "function":
                     select_tool_choice = request.tool_choice.function.name
                 else:
@@ -122,14 +124,16 @@ class OpenAIToolsPrompter:
             else:
                 select_tool_choice = None
             text_inject = self.template.render_toolslist(
-            tool_choice=select_tool_choice, tools_list=request.tools)
+                tool_choice=select_tool_choice, tools_list=request.tools)
             if isinstance(request.messages, str):
                 request.messages = text_inject + request.messages
             elif isinstance(request.messages,
                             List) and len(request.messages) >= 1:
                 content = request.messages[0].content
                 last_human_index = content.rfind('### Human：')
-                updated_content = content[:last_human_index + len('### Human:')] + text_inject + "\n" + content[last_human_index + len('### Human:'):]
+                updated_content = content[:last_human_index + len(
+                    '### Human:')] + text_inject + "\n" + content[
+                        last_human_index + len('### Human:'):]
                 request.messages[0].content = updated_content
 
 
@@ -146,14 +150,15 @@ class ChatPromptCapture:
 
     def __str__(self):
         """ Show current state. For debugging purpose. """
-        return (f"ChatPromptCapture {{\n"
-                f"    maybe_function_call={self.maybe_function_call},\n"
-                f"    is_function_call={self.is_function_call},\n"
-                f"    prefix_size={self.prefix_size},\n"
-                f"    after_new_function_call={self.after_new_function_call},\n"
-                f"    content={self.content},\n"
-                f"    calls_list={self.calls_list},\n"
-                f"}}")
+        return (
+            f"ChatPromptCapture {{\n"
+            f"    maybe_function_call={self.maybe_function_call},\n"
+            f"    is_function_call={self.is_function_call},\n"
+            f"    prefix_size={self.prefix_size},\n"
+            f"    after_new_function_call={self.after_new_function_call},\n"
+            f"    content={self.content},\n"
+            f"    calls_list={self.calls_list},\n"
+            f"}}")
 
     def reset(self, reset_calls_list=False):
         self.content = ""
@@ -167,7 +172,8 @@ class ChatPromptCapture:
     def num_calls(self):
         return len(self.calls_list)
 
-    def startNamedFunction(self, tool_choice: ChatCompletionNamedToolChoiceParam):
+    def startNamedFunction(self,
+                           tool_choice: ChatCompletionNamedToolChoiceParam):
         # Shound not have to be templated since it's defined by the OpenAI reference:
         self.content = "{ \"name\": \"" + tool_choice.function.name + "\", \"arguments\": "
         self.named_function_call = True
@@ -196,7 +202,9 @@ class ChatPromptCapture:
                     self.calls_list.append(call_dict)
             except json.decoder.JSONDecodeError as exc:
                 # Simply ignore invalid functions calls...
-                logger.warning("Error in parsing the function call. This should not happen since it's guided generation : %s" % str(exc))
+                logger.warning(
+                    "Error in parsing the function call. This should not happen since it's guided generation : %s"
+                    % str(exc))
                 pass
         else:
             calls_list = self.content.split(prompter.func_call_token())
@@ -219,7 +227,8 @@ class ChatPromptCapture:
             function_call = Function(name=call["name"],
                                      arguments=json.dumps(arguments)
                                      if arguments is not None else "")
-            return ChatCompletionMessageToolCall(index=call_id, id="call_" + call["name"] +
+            return ChatCompletionMessageToolCall(index=call_id,
+                                                 id="call_" + call["name"] +
                                                  "_" + str(call_id),
                                                  type="function",
                                                  function=function_call)

@@ -172,9 +172,7 @@ def run_conversation(question: str, tool_choice_param):
 print("#############################################################")
 question = "What's the weather like in San Francisco, Tokyo, and Paris ? We also need to know the current date."
 print("New request using templates: %s" % question)
-auto_result = run_conversation(
-    question=question,
-    tool_choice_param="auto")
+auto_result = run_conversation(question=question, tool_choice_param="auto")
 print("Final response (tool_choice=\"auto\"):\n%s" % auto_result)
 print("#############################################################\n")
 

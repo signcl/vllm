@@ -138,10 +138,10 @@ class ThomasAttention(nn.Module):
             rope_scaling=rope_scaling,
         )
         self.attn = Attention(self.num_heads,
-                                   self.head_dim,
-                                   self.scaling,
-                                   num_kv_heads=self.num_kv_heads,
-                                   sliding_window=sliding_window)
+                              self.head_dim,
+                              self.scaling,
+                              num_kv_heads=self.num_kv_heads,
+                              sliding_window=sliding_window)
 
     def forward(
         self,
@@ -310,7 +310,9 @@ class ThomasForCausalLM(nn.Module):
         super().__init__()
         self.config = config
         self.linear_method = linear_method
-        self.model = ThomasModel(config, linear_method, lora_config=lora_config)
+        self.model = ThomasModel(config,
+                                 linear_method,
+                                 lora_config=lora_config)
         self.unpadded_vocab_size = config.vocab_size
         if lora_config:
             self.unpadded_vocab_size += lora_config.lora_extra_vocab_size

@@ -188,8 +188,8 @@ def _loadServingServices():
 
     openai_serving_completion = OpenAIServingCompletion(
         vllm_engine, served_model, args.lora_modules)
-    
-    
+
+
 # Add prometheus asgi middleware to route /metrics requests
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
@@ -284,7 +284,7 @@ if __name__ == "__main__":
 
     logger.info(f"vLLM API server version v0.3.3")
     logger.info(f"args: {args}")
-    
+
     if args.privileged:
         logger.warning(
             "\n"
@@ -298,7 +298,7 @@ if __name__ == "__main__":
         served_model = args.served_model_name
     else:
         served_model = args.model
-    
+
     vllm_engine_args = AsyncEngineArgs.from_cli_args(args)
     vllm_engine = AsyncLLMEngine.from_engine_args(vllm_engine_args)
     _loadServingServices()

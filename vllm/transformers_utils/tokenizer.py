@@ -27,7 +27,8 @@ def get_tokenizer(
         kwargs["use_fast"] = False
 
     try:
-        if "thomas" in tokenizer_name.lower() or "carbon" in tokenizer_name.lower():
+        if "thomas" in tokenizer_name.lower(
+        ) or "carbon" in tokenizer_name.lower():
             tokenizer = ThomasTokenizer.from_pretrained(
                 tokenizer_name,
                 *args,

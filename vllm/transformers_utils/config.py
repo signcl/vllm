@@ -28,11 +28,11 @@ def get_config(model: str,
         return config
     if "carbon" in model.lower() or "thomas" in model.lower():
         config_class = _CONFIG_REGISTRY["thomas"]
-        config = config_class.from_pretrained(model, 
+        config = config_class.from_pretrained(model,
                                               revision=revision,
                                               code_revision=code_revision)
         return config
-    
+
     try:
         config = AutoConfig.from_pretrained(
             model,
