@@ -123,14 +123,14 @@ class OpenAIToolsPrompter:
                 select_tool_choice = None
             text_inject = self.template.render_toolslist(
             tool_choice=select_tool_choice, tools_list=request.tools)
-            # text_inject = '''You are a xiaosuan, a large language model trained by openbayes computing.\nYou are a helpful, respectful, and honest assistant. \n### Human：\n''' + text_inject
-            text_inject = '''\n### Human：\n''' + text_inject
             if isinstance(request.messages, str):
                 request.messages = text_inject + request.messages
             elif isinstance(request.messages,
                             List) and len(request.messages) >= 1:
-                request.messages[
-                    0].content = text_inject + request.messages[0].content
+                content = request.messages[0].content
+                last_human_index = content.rfind('### Human：')
+                updated_content = content[:last_human_index + len('### Human:')] + text_inject + "\n" + content[last_human_index + len('### Human:'):]
+                request.messages[0].content = updated_content
 
 
 class ChatPromptCapture:
