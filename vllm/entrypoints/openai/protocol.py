@@ -228,6 +228,8 @@ class CompletionRequest(BaseModel):
     best_of: Optional[int] = None
     logit_bias: Optional[Dict[str, float]] = None
     user: Optional[str] = None
+    tools: Optional[List[ChatCompletionToolParam]] = None
+    tool_choice: Optional[Union[Literal["auto", "none"], ChatCompletionNamedToolChoiceParam]] = "auto"
     # Additional parameters supported by vLLM
     top_k: Optional[int] = -1
     ignore_eos: Optional[bool] = False
