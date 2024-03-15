@@ -129,8 +129,10 @@ class OpenAIToolsPrompter:
                 request.messages = text_inject + request.messages
             elif isinstance(request.messages,
                             List) and len(request.messages) >= 1:
-                request.messages[
-                    0].content = text_inject + request.messages[0].content
+                content = request.messages[0].content
+                last_human_index = content.rfind('### Human：')
+                updated_content = content[:last_human_index + len('### Human:')] + text_inject + "\n" + content[last_human_index + len('### Human:'):]
+                request.messages[0].content = updated_content
 
 
 class ChatPromptCapture:
