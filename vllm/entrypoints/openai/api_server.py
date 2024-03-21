@@ -19,9 +19,7 @@ from fastapi.responses import JSONResponse, StreamingResponse, Response
 import vllm
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.async_llm_engine import AsyncLLMEngine
-from vllm.entrypoints.openai.protocol import (CompletionRequest,
-                                              ChatCompletionRequest,
-                                              ErrorResponse)
+from vllm.entrypoints.openai.protocol import CompletionRequest, ChatCompletionRequest, ErrorResponse
 from vllm.logger import init_logger
 from vllm.entrypoints.openai.serving_chat import OpenAIServingChat
 from vllm.entrypoints.openai.serving_completion import OpenAIServingCompletion
@@ -90,11 +88,13 @@ def parse_args():
                         type=json.loads,
                         default=["*"],
                         help="allowed headers")
-    parser.add_argument("--api-key",
-                        type=str,
-                        default=None,
-                        help="If provided, the server will require this key "
-                        "to be presented in the header.")
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default=None,
+        help=
+        "If provided, the server will require this key to be presented in the header."
+    )
     parser.add_argument("--served-model-name",
                         type=str,
                         default=None,
@@ -107,18 +107,15 @@ def parse_args():
         default=None,
         nargs='+',
         action=LoRAParserAction,
-        help="LoRA module configurations in the format name=path. "
-        "Multiple modules can be specified.")
+        help=
+        "LoRA module configurations in the format name=path. Multiple modules can be specified."
+    )
     parser.add_argument("--chat-template",
                         type=str,
                         default=None,
                         help="The file path to the chat template, "
                         "or the template in single-line form "
                         "for the specified model")
-    parser.add_argument("--tools-template",
-                        type=str,
-                        default=None,
-                        help="The file path to alternative tools template")
     parser.add_argument("--enable-api-tools",
                         action="store_true",
                         help="Enable OpenAI-like tools API "
@@ -155,10 +152,9 @@ def parse_args():
         help="Additional ASGI middleware to apply to the app. "
         "We accept multiple --middleware arguments. "
         "The value should be an import path. "
-        "If a function is provided, vLLM will add it to the server "
-        "using @app.middleware('http'). "
-        "If a class is provided, vLLM will add it to the server "
-        "using app.add_middleware(). ")
+        "If a function is provided, vLLM will add it to the server using @app.middleware('http'). "
+        "If a class is provided, vLLM will add it to the server using app.add_middleware(). "
+    )
 
     parser = AsyncEngineArgs.add_cli_args(parser)
     return parser.parse_args()
@@ -176,7 +172,7 @@ def _loadServingServices():
         del openai_serving_completion
 
     openai_tools_prompter = OpenAIToolsPrompter(
-        template_path=args.tools_template) if args.enable_api_tools else None
+    ) if args.enable_api_tools else None
     openai_serving_chat = OpenAIServingChat(
         engine=vllm_engine,
         served_model=served_model,
@@ -188,8 +184,8 @@ def _loadServingServices():
 
     openai_serving_completion = OpenAIServingCompletion(
         vllm_engine, served_model, args.lora_modules)
-    
-    
+
+
 # Add prometheus asgi middleware to route /metrics requests
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
@@ -204,8 +200,17 @@ async def validation_exception_handler(_, exc):
 @app.get("/health")
 async def health() -> Response:
     """Health check."""
-    await openai_serving_chat.engine.check_health()
     return Response(status_code=200)
+
+
+if "--privileged" in sys.argv:
+
+    @app.get("/privileged")
+    async def privileged() -> Response:
+        """Reload the API internals. Danger !"""
+        logger.warning("privileged called.")
+        _loadServingServices()
+        return Response(status_code=200)
 
 
 @app.get("/v1/models")
@@ -216,7 +221,7 @@ async def show_available_models():
 
 @app.get("/version")
 async def show_version():
-    ver = {"version": 'v0.3.3'}
+    ver = {"version": vllm.__version__}
     return JSONResponse(content=ver)
 
 
@@ -279,12 +284,13 @@ if __name__ == "__main__":
         elif inspect.iscoroutinefunction(imported):
             app.middleware("http")(imported)
         else:
-            raise ValueError(f"Invalid middleware {middleware}. "
-                             f"Must be a function or a class.")
+            raise ValueError(
+                f"Invalid middleware {middleware}. Must be a function or a class."
+            )
 
-    logger.info(f"vLLM API server version v0.3.3")
+    logger.info(f"vLLM API server version {vllm.__version__}")
     logger.info(f"args: {args}")
-    
+
     if args.privileged:
         logger.warning(
             "\n"
@@ -298,10 +304,11 @@ if __name__ == "__main__":
         served_model = args.served_model_name
     else:
         served_model = args.model
-    
+
     vllm_engine_args = AsyncEngineArgs.from_cli_args(args)
     vllm_engine = AsyncLLMEngine.from_engine_args(vllm_engine_args)
     _loadServingServices()
+
 
     app.root_path = args.root_path
     uvicorn.run(app,
